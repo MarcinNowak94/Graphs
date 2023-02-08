@@ -9,14 +9,34 @@
 import matplotlib.pyplot as plt
 import networkx as nx   #advised naming convention
 
+Config={
+    "NodeSize": 700,
+    "EdgeWidth": 3,
+    "FontSize": 15,
+    "FontFamily": "sans-serif"
+}
 
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
-def DisplayGraph(graph, pos):
-    
-    #pos = nx.spring_layout(graph, seed=3068)  # Seed layout for reproducibility
-    nx.draw(graph, pos=pos, with_labels=True)
-    #plt.title(label="Graf")
+def DisplayGraph(G, pos):
+    # nodes
+    nx.draw_networkx_nodes(G, pos, node_size=Config["NodeSize"])
+
+    # edges
+    edges = [(u, v) for (u, v, d) in G.edges(data=True)]
+    nx.draw_networkx_edges(G, pos, edgelist=edges, width=Config["EdgeWidth"])
+
+    # node labels
+    nx.draw_networkx_labels(G, pos, font_size=Config["FontSize"], font_family=Config["FontFamily"])
+    # edge weight labels
+    edge_labels = nx.get_edge_attributes(G, "weight")
+    nx.draw_networkx_edge_labels(G, pos, edge_labels)
+
+    ax = plt.gca()
+    ax.margins(0.08)
+    ax.set_title(G.name)
+    plt.axis("off")
+    plt.tight_layout()
     plt.show()
 
 
