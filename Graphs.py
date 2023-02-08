@@ -170,15 +170,19 @@ class Graph2(Graph):
 #-------------------------------------------------------------------------------
 
 
-
-g = { "a" : {"d", "f"},
-      "b" : {"c"},
-      "c" : {"b", "c", "d", "e"},
-      "d" : {"a", "c"},
-      "e" : {"c"},
-      "f" : {"d"}
+#LAB 4.2 Example
+example = { "START" : {"A", "C"},
+      "A" : {"B", "D"},
+      "B" : {"META"},
+      "C" : {"D"},
+      "D" : {"B", "META"},
+      "META" : {}
     }
 
 
-graph = Graph2(g)
+graph = Graph2(example)
+
+print("All edges: ")
+print(graph.all_edges())
+
 print(graph.degree_sequence())
