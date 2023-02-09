@@ -9,6 +9,7 @@
 import matplotlib.pyplot as plt
 import networkx as nx   #advised naming convention
 import time
+import sys
 
 Config={
     "NodeSize": 700,
@@ -19,17 +20,50 @@ Config={
 }
 
 #-------------------------------------------------------------------------------
-def CalculateCriticalPath(G):
+#Opis algorytmu krok po kroku:
+#Każdy wierzchołek oznacz kosztem MINIMALNYM, wierzchołek START kosztem 0
+#Zacznij od punktu START
+#Przejdź do kolejnego wierzchołka pierwszą dostępną krawędzią.
+#Oblicz koszt ścieżki jako koszt punktu z którego wychodzi krawędź + koszt krawędzi
+#Jeśli koszt ścieżki jest większy niż koszt wierzchołka przypisz wierzchołkowi koszt ścieżki i zapisz pełną ścieżkę od punktu START z nim związaną 
+#Powtarzaj dla każdego wierzchołka do momentu obliczenia wszystkich ścieżek
+#Zapisana ścieżka o najwyższym koszcie jest ścieżką krytyczną
+#-------------------------------------------------------------------------------
+class Edge():
+    def __init__(self,
+                 source,
+                destination,
+                cost,
+                criticalpath):
+        self.source=source,
+        self.destination=destination,
+        self.cost=cost,
+        self.criticalpath=sys.minsize   #initialize with minimal possible value
+
+
+def CalculateCriticalPath(G, startnode, endnode):
     emph={
         "src":"",
         "dst":""
     }
+    
+    criticalpaths={}
+    for node in G.adj:
+        criticalpaths[node]={"cost":-sys.maxsize,"path":node} 
+    criticalpaths[startnode]={"cost":0,"path":startnode}
 
-    for edge in G.edges:
-        emph["src"]=edge[0]
-        emph["dst"]=edge[1]
-        
-        DisplayGraph(G, pos, emph)
+    for edge in G.edges(data=True):
+        start=edge[0]
+        end=edge[1]
+        emph["src"]=start
+        emph["dst"]=end
+        if (criticalpaths[end]["cost"]<edge[2]["weight"]):
+            criticalpaths[end]={
+                "cost":criticalpaths[start]["cost"]+edge[2]["weight"],
+                "path":criticalpaths[start]["path"]+end
+                }
+        #DisplayGraph(G, pos, emph)
+    print("Critical path from node "+startnode+" to node " +endnode+ " is: "+criticalpaths[endnode]["path"]+" its cost is "+str(criticalpaths[endnode]["cost"]+"."))
     print("Not ready yet, please come again later\n")
 #-------------------------------------------------------------------------------
 def DisplayGraphData(G, issimple):
@@ -122,7 +156,6 @@ emph={
     "src":"",
     "dst":""
 }
-DisplayGraph(G, pos, emph)
+#DisplayGraph(G, pos, emph)
 
-
-CalculateCriticalPath(G)
+CalculateCriticalPath(G, "START", "META")
