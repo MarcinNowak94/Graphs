@@ -59,9 +59,7 @@ def CalculateCriticalPath(graph, startnode, endnode):
                     "path":criticalpaths[start]["path"]+"->"+end
                     }
             #print(criticalpaths)
-            #emph["src"]=start
-            #emph["dst"]=end
-            #DisplayGraph(G, pos, emph)
+            DisplayGraph(G, pos, {"src":start,"dst":end})
         print("Critical path from node "+startnode+" to node " +endnode+ " is: "+criticalpaths[endnode]["path"]+" its cost is "+str(criticalpaths[endnode]["cost"])+".")
     print("Not ready yet, please come again later\n")
 #-------------------------------------------------------------------------------
