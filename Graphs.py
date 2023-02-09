@@ -34,36 +34,48 @@ class Edge():
                  source,
                 destination,
                 cost,
+                inputs,
                 criticalpath):
         self.source=source,
         self.destination=destination,
         self.cost=cost,
+        self.inputs=inputs,
         self.criticalpath=sys.minsize   #initialize with minimal possible value
 
 
-def CalculateCriticalPath(G, startnode, endnode):
+def CalculateCriticalPath(graph, startnode, endnode):
+    G=graph #local copy for modification
     emph={
         "src":"",
         "dst":""
     }
     
     criticalpaths={}
-    for node in G.adj:
-        criticalpaths[node]={"cost":-sys.maxsize,"path":node} 
+    for node in G.nodes:
+        criticalpaths[node]={"cost":-sys.maxsize,"path":node, "inputs":G.in_degree[node]}
     criticalpaths[startnode]={"cost":0,"path":startnode}
-
-    for edge in G.edges(data=True):
-        start=edge[0]
-        end=edge[1]
-        emph["src"]=start
-        emph["dst"]=end
-        if (criticalpaths[end]["cost"]<edge[2]["weight"]):
-            criticalpaths[end]={
-                "cost":criticalpaths[start]["cost"]+edge[2]["weight"],
-                "path":criticalpaths[start]["path"]+end
-                }
+    while changes>0:
+        changes=0
+        for node in G.nodes:
+            edges=[(src, dst, cost) for (src, dst, cost) in G.edges(data=True) if src==node]
+            view=G.adj[node]
+            print("---------Current node: "+node+"----------------")
+            #print("---------Adjecent: "+str(view)+"----------------")
+            #print("---------Edges: "+str(edges)+"----------------")
+            for edge in edges:
+                start=edge[0]
+                end=edge[1]
+                emph["src"]=start
+                emph["dst"]=end
+                #print(edge)
+                if (criticalpaths[end]["cost"]<edge[2]["weight"]):
+                    criticalpaths[end]={
+                        "cost":criticalpaths[start]["cost"]+edge[2]["weight"],
+                        "path":criticalpaths[start]["path"]+"->"+end
+                        }
+            #print(criticalpaths)
         #DisplayGraph(G, pos, emph)
-    print("Critical path from node "+startnode+" to node " +endnode+ " is: "+criticalpaths[endnode]["path"]+" its cost is "+str(criticalpaths[endnode]["cost"]+"."))
+        print("Critical path from node "+startnode+" to node " +endnode+ " is: "+criticalpaths[endnode]["path"]+" its cost is "+str(criticalpaths[endnode]["cost"])+".")
     print("Not ready yet, please come again later\n")
 #-------------------------------------------------------------------------------
 def DisplayGraphData(G, issimple):
@@ -109,7 +121,7 @@ def DisplayGraph(G, pos, emph):
 
     # edges
     edges = [(u, v) for (u, v, d) in G.edges(data=True) if not(u==emph["src"] and v==emph["dst"])]
-    enlarged = [(u, v) for (u, v, d) in G.edges(data=True) if (u==emph["src"] and v==emph["dst"]) ]
+    enlarged = [(u, v) for (u, v, d) in G.edges(data=True) if (u==emph["src"] and v==emph["dst"])]
     
     nx.draw_networkx_edges(G, pos, edgelist=edges, width=Config["EdgeWidth"])
     nx.draw_networkx_edges(G, pos, edgelist=enlarged, width=Config["EmphasizedEdgeWidth"])
