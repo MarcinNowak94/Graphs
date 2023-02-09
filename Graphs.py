@@ -29,19 +29,6 @@ Config={
 #Powtarzaj dla każdego wierzchołka do momentu obliczenia wszystkich ścieżek
 #Zapisana ścieżka o najwyższym koszcie jest ścieżką krytyczną
 #-------------------------------------------------------------------------------
-class Edge():
-    def __init__(self,
-                 source,
-                destination,
-                cost,
-                inputs,
-                criticalpath):
-        self.source=source,
-        self.destination=destination,
-        self.cost=cost,
-        self.inputs=inputs,
-        self.criticalpath=sys.minsize   #initialize with minimal possible value
-
 
 def CalculateCriticalPath(graph, startnode, endnode):
     G=graph #local copy for modification
@@ -52,29 +39,29 @@ def CalculateCriticalPath(graph, startnode, endnode):
     
     criticalpaths={}
     for node in G.nodes:
-        criticalpaths[node]={"cost":-sys.maxsize,"path":node, "inputs":G.in_degree[node]}
+        criticalpaths[node]={
+            "cost":-sys.maxsize,
+            "path":node, 
+            "inputs":G.in_degree[node], 
+            "visited":False}
     criticalpaths[startnode]={"cost":0,"path":startnode}
-    while changes>0:
-        changes=0
-        for node in G.nodes:
-            edges=[(src, dst, cost) for (src, dst, cost) in G.edges(data=True) if src==node]
-            view=G.adj[node]
-            print("---------Current node: "+node+"----------------")
-            #print("---------Adjecent: "+str(view)+"----------------")
-            #print("---------Edges: "+str(edges)+"----------------")
-            for edge in edges:
-                start=edge[0]
-                end=edge[1]
-                emph["src"]=start
-                emph["dst"]=end
-                #print(edge)
-                if (criticalpaths[end]["cost"]<edge[2]["weight"]):
-                    criticalpaths[end]={
-                        "cost":criticalpaths[start]["cost"]+edge[2]["weight"],
-                        "path":criticalpaths[start]["path"]+"->"+end
-                        }
+
+    #TODO: to fix create Breadth-first queue https://pl.wikipedia.org/wiki/Sortowanie_topologiczne
+    for (node, out) in G.out_degree:
+        edges=[(src, dst, cost) for (src, dst, cost) in G.edges(data=True) if src==node]
+        #print("---------Current node: "+node+"----------------")
+        for (start, end, weight) in edges:
+            cost=weight["weight"]
+            print(start+end+" weight:"+str(cost))
+            if (criticalpaths[end]["cost"]<cost):
+                criticalpaths[end]={
+                    "cost":criticalpaths[start]["cost"]+cost,
+                    "path":criticalpaths[start]["path"]+"->"+end
+                    }
             #print(criticalpaths)
-        #DisplayGraph(G, pos, emph)
+            #emph["src"]=start
+            #emph["dst"]=end
+            #DisplayGraph(G, pos, emph)
         print("Critical path from node "+startnode+" to node " +endnode+ " is: "+criticalpaths[endnode]["path"]+" its cost is "+str(criticalpaths[endnode]["cost"])+".")
     print("Not ready yet, please come again later\n")
 #-------------------------------------------------------------------------------
@@ -162,7 +149,7 @@ G = nx.DiGraph(name="Graf")
 issimplegraph=False
 G.add_weighted_edges_from(example)
 
-DisplayGraphData(G, issimplegraph)
+#DisplayGraphData(G, issimplegraph)
 
 emph={
     "src":"",
